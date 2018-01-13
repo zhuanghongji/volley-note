@@ -24,7 +24,11 @@ Volley 的核心库是在 GitHub 上开发的，该仓库包含主要的请求�
 ```gradle
 dependencies {
     ...
+    // Android Studio 版本小于 3.0
     compile 'com.android.volley:volley:1.1.0'
+
+    // Android Studio 版本小于 3.0
+    implementation 'com.android.volley:volley:1.1.0'
 }
 ```
 
@@ -41,6 +45,10 @@ git clone https://github.com/google/volley
 * [设置请求队列](https://github.com/zhuanghongji/volley-note/blob/master/guide/setting-up-a-requestqueue.md)
 * [发起一个标准请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/making-a-standard-request.md)
 * [自定义请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/implementing-a-custom-request.md)
+
+示例
+* [示例代码 /sample]()
+* [示例分析 /sample/README.md]()
 
 # 源码分析
 * Volley 访问网络的整体流程
