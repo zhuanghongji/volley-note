@@ -6,7 +6,7 @@
 
 本文描述了如何通过 `Volley.newRequestQueue` 方法创建简单的请求队列并发送请求（如何将请求加入请求队列和取消请求）。
 
-如何对请求队列进行定制可以看下一篇文章 [定制请求队列]() 。
+如何对请求队列进行定制可以看下一篇文章 [设置请求队列](https://github.com/zhuanghongji/volley-note/blob/master/guide/setting-up-a-requestqueue.md) 。
 
 ## 添加网络权限
 首先，在 AndroidManifest.xml 文件中添加 **android.permission.INTERNET** 权限。

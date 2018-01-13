@@ -4,7 +4,7 @@
 * `JsonObjectRequest` 和 `JsonArrayRequest`（两者都是 `JsonRequest` 的子类）：指定一个 URL 并获取响应中的 JSON 对象或数组
 
 如果你的请求符合上述类型，你可能就不需要再去自定义请求了。
-如何在 Volly 中自定义请求，见下一篇文章 [自定义请求]() 。
+如何在 Volly 中自定义请求，见下一篇文章 [自定义请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/implementing-a-custom-request.md) 。
 
 # JSON 请求
 Volly 提供了下面两个类来处理 JSON 请求：

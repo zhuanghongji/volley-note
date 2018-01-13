@@ -53,7 +53,7 @@ mRequestQueue.add(stringRequest);
 
 如果您只是想发送一个一次性的请求，且不想离开线程池，则可以在需要的地方创建 `RequestQueue`，并在你的响应或错误返回时使用 `RequestQueue` 的 `stop()` 方法。
 
-创建简单请求队列可参考 [发送一个简单请求]() 中的 `Volley.newRequestQueue()` 方法部分。
+创建简单请求队列可参考 [发送一个简单请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/sending-a-simple-request.md) 中的 `Volley.newRequestQueue()` 方法部分。
 
 但实际上，更常见的使用方法是将 `RequestQueue` 创建为一个单例。
 

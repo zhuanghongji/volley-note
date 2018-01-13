@@ -102,4 +102,4 @@ public class GsonRequest<T> extends Request<T> {
 }
 ```
 
-实际上 Volley 已经提供了即时可用的 `JsonArrayRequest` 和 `JsonObjectObject` 类，如果你喜欢采用这种方法的话，可参考 [发起一个标准请求]() 。
+实际上 Volley 已经提供了即时可用的 `JsonArrayRequest` 和 `JsonObjectObject` 类，如果你喜欢采用这种方法的话，可参考 [发起一个标准请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/making-a-standard-request.md) 。

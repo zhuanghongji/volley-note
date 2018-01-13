@@ -37,10 +37,10 @@ git clone https://github.com/google/volley
 
 # 基本用法
 官方文档总结
-* 发起一个简单请求
-* 设置请求队列
-* 发起一个标准请求
-* 自定义请求
+* [发起一个简单请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/sending-a-simple-request.md)
+* [设置请求队列](https://github.com/zhuanghongji/volley-note/blob/master/guide/setting-up-a-requestqueue.md)
+* [发起一个标准请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/making-a-standard-request.md)
+* [自定义请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/implementing-a-custom-request.md)
 
 # 源码分析
 * Volley 访问网络的整体流程
@@ -53,15 +53,3 @@ git clone https://github.com/google/volley
 * [郭霖：Android Volley 完全解析（二）使用Volley加载网络图片](http://blog.csdn.net/guolin_blog/article/details/17482165)
 * [郭霖：Android Volley 完全解析（三）定制自己的Request](http://blog.csdn.net/guolin_blog/article/details/17612763)
 * [郭霖：Android Volley 完全解析（四）带你从源码的角度理解Volley](http://blog.csdn.net/guolin_blog/article/details/17656437)
-
-
-
-
-
-
-
-
-
-
-
-*
