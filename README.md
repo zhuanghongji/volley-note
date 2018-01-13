@@ -27,7 +27,7 @@ dependencies {
     // Android Studio 版本小于 3.0
     compile 'com.android.volley:volley:1.1.0'
 
-    // Android Studio 版本小于 3.0
+    // Android Studio 版本大于 3.0
     implementation 'com.android.volley:volley:1.1.0'
 }
 ```
@@ -47,8 +47,8 @@ git clone https://github.com/google/volley
 * [自定义请求](https://github.com/zhuanghongji/volley-note/blob/master/guide/implementing-a-custom-request.md)
 
 示例
-* [示例代码 /sample]()
-* [示例分析 /sample/README.md]()
+* [示例代码 /sample](https://github.com/zhuanghongji/volley-note/tree/master/sample)
+* [示例分析 /sample/README.md](https://github.com/zhuanghongji/volley-note/blob/master/sample/README.md)
 
 # 源码分析
 * Volley 访问网络的整体流程
