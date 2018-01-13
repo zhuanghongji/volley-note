@@ -10,7 +10,7 @@ Volley 提供了一下特性：
 * 支持高并发网络连接
 * 透明的磁盘和内存响应缓存与 HTTP 缓存标准保持一致
 * 请求支持优先级
-* 支持取消单一请求或一类请求
+* 支持取消单一请求或一定范围的请求
 * 定制化容易，比如重试或 backoff
 * 强大的排序使得从网络异步获取的数据能正确填充您的用户界面，且这个过程十分容易
 * 调试和跟踪工具
@@ -36,10 +36,11 @@ git clone https://github.com/google/volley
 2. 将下载后的资源文件作为一个 Android library module 导入到你的项目中，具体步骤可参考 [创建 Android 库](https://developer.android.com/studio/projects/android-library.html) 。
 
 # 基本用法
-* 发起一个简单的请求
+官方文档总结
+* 发起一个简单请求
 * 设置请求队列
-* 发起一个标准的请求
-* 实现一个自定义的请求
+* 发起一个标准请求
+* 自定义请求
 
 # 源码分析
 * Volley 访问网络的整体流程
@@ -63,4 +64,4 @@ git clone https://github.com/google/volley
 
 
 
-* 
+*
