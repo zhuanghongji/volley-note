@@ -17,12 +17,17 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
+import com.zhuanghongji.volley.sample.volley.GsonRequest;
 import com.zhuanghongji.volley.sample.volley.VolleySingleton;
+import com.zhuanghongji.volley.sample.volley.XmlRequest;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -165,8 +170,56 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void onGsonRequestTest(View view) {
+        String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiGsonRequest";
+        GsonRequest<Weather> request = new GsonRequest<>(url, Weather.class, null,
+                new Response.Listener<Weather>() {
+                    @Override
+                    public void onResponse(Weather weather) {
+                        Log.d(TAG, "response = " + weather.toString());
+
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, error.getMessage(), error);
+                    }
+        });
+
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
     }
 
     public void onXmlRequestTest(View view) {
+        String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiXmlRequest";
+        XmlRequest request = new XmlRequest(url, new Response.Listener<XmlPullParser>() {
+            @Override
+            public void onResponse(XmlPullParser response) {
+                try {
+                    int eventType = response.getEventType();
+                    while (eventType != XmlPullParser.END_DOCUMENT) {
+                        switch (eventType) {
+                            case XmlPullParser.START_TAG:
+                                String nodeName = response.getName();
+                                if ("city".equals(nodeName)) {
+                                    String quName = response.getAttributeValue(0);
+                                    Log.d(TAG, "quName is " + quName);
+                                }
+                                break;
+                        }
+                        eventType = response.next();
+                    }
+                } catch (XmlPullParserException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("TAG", error.getMessage(), error);
+            }
+        });
+
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
     }
 }

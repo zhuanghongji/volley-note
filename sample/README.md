@@ -233,8 +233,8 @@ com.zhuanghongji.volley.sample D/MainActivity: student scope = 97
 
 现在我们将上面两个示例的 url 调换一下进行测试。
 
-### `JsonObjectRequest` 去请求 ”数组结构的Json数据“
-Volley 解析出现异常，回调 `onErrorResponse()` 方法，打印日志如下:
+### 若用 `JsonObjectRequest` 去请求 ”数组结构的Json数据“
+Volley 会出现解析异常，回调 `onErrorResponse()` 方法，打印日志如下:
 ```
 com.zhuanghongji.volley.sample E/MainActivity: org.json.JSONException: Value [{"id":"3","name":"张三","scope":"93"},{"id":"4","name":"李四","scope":"94"},{"id":"5","name":"王五","scope":"95"},{"id":"6","name":"赵六","scope":"96"},{"id":"7","name":"孙七","scope":"97"}] of type org.json.JSONArray cannot be converted to JSONObject
                                                com.android.volley.ParseError: org.json.JSONException: Value [{"id":"3","name":"张三","scope":"93"},{"id":"4","name":"李四","scope":"94"},{"id":"5","name":"王五","scope":"95"},{"id":"6","name":"赵六","scope":"96"},{"id":"7","name":"孙七","scope":"97"}] of type org.json.JSONArray cannot be converted to JSONObject
@@ -250,8 +250,8 @@ com.zhuanghongji.volley.sample E/MainActivity: org.json.JSONException: Value [{"
                                                    at com.android.volley.NetworkDispatcher.run(NetworkDispatcher.java:87) Â
 ```
 
-### `JsonArrayRequest` 去请求 ”单一结构的Json数据“
-Volley 同样会出现解析异常，回调 `onErrorResponse()` 方法，打印日志如下：
+### 若用 `JsonArrayRequest` 去请求 ”单一结构的Json数据“
+Volley 也同样会出现解析异常，回调 `onErrorResponse()` 方法，打印日志如下：
 ```
 com.zhuanghongji.volley.sample E/MainActivity: org.json.JSONException: Value {"students":[{"id":"3","name":"张三","scope":"93"},{"id":"4","name":"李四","scope":"94"},{"id":"5","name":"王五","scope":"95"},{"id":"6","name":"赵六","scope":"96"},{"id":"7","name":"孙七","scope":"97"}]} of type org.json.JSONObject cannot be converted to JSONArray
                                                com.android.volley.ParseError: org.json.JSONException: Value {"students":[{"id":"3","name":"张三","scope":"93"},{"id":"4","name":"李四","scope":"94"},{"id":"5","name":"王五","scope":"95"},{"id":"6","name":"赵六","scope":"96"},{"id":"7","name":"孙七","scope":"97"}]} of type org.json.JSONObject cannot be converted to JSONArray
@@ -393,8 +393,197 @@ networkImageView.setImageUrl(url, loader);
 ![](./image/NetworkImageView.gif)
 
 # 自定义请求
+当 Volley 提供的请求类型不满足我们的需求时，Volley 提供的扩展机制使得我们可以很轻松的定制任意类型的请求。
+
 ## 自定义 GsonRequest
+先添加相关依赖
+```gradle
+implementation 'com.google.code.gson:gson:2.8.2'
+```
+
+实现代码
+```Java
+public class GsonRequest<T> extends Request<T> {
+
+    private final Gson mGson = new Gson();
+
+    private final Class<T> mClazz;
+
+    @Nullable
+    private final Map<String, String> mHeaders;
+
+    private final Response.Listener<T> mListener;
+
+    /**
+     * Make a GET request and return a parsed object from JSON.
+     *
+     * @param url URL of the request to make
+     * @param clazz Relevant class object, for Gson's reflection
+     * @param headers Map of request headers
+     */
+    public GsonRequest(String url, Class<T> clazz, @Nullable Map<String, String> headers,
+                       Response.Listener<T> listener, Response.ErrorListener errorListener) {
+        super(Method.GET, url, errorListener);
+        mClazz = clazz;
+        mHeaders = headers;
+        mListener = listener;
+    }
+
+    @Override
+    public Map<String, String> getHeaders() throws AuthFailureError {
+        return mHeaders != null ? mHeaders : super.getHeaders();
+    }
+
+    @Override
+    protected Response<T> parseNetworkResponse(NetworkResponse response) {
+        try {
+            String json = new String(response.data,
+                    HttpHeaderParser.parseCharset(response.headers));
+            return Response.success(mGson.fromJson(json, mClazz),
+                    HttpHeaderParser.parseCacheHeaders(response));
+        } catch (UnsupportedEncodingException e) {
+            return Response.error(new ParseError(e));
+        }
+    }
+
+    @Override
+    protected void deliverResponse(T response) {
+        mListener.onResponse(response);
+    }
+}
+```
+
+我们先在 [MockApi](http://wanandroid.com/tools/mockapi) 生成一个返回链接 [http://wanandroid.com/tools/mockapi/1921/zhuanghongjiGsonRequest](http://wanandroid.com/tools/mockapi/1921/zhuanghongjiGsonRequest)，返回结果为：
+```JSON
+{
+  "weatherInfo": {
+    "city": "北京",
+    "cityId": "101010100",
+    "temp": "19",
+    "wd": "南风",
+    "ws": "2级",
+    "sd": "43%",
+    "wse": "2",
+    "time": "19:45",
+    "isRadar": "1",
+    "radar": "JC_RADAR_AZ9010_JB"
+  }
+}
+```
+
+示例代码和响应打印结果：
+```Java
+String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiGsonRequest";
+GsonRequest<Weather> request = new GsonRequest<>(url, Weather.class, null,
+        new Response.Listener<Weather>() {
+            @Override
+            public void onResponse(Weather weather) {
+                Log.d(TAG, "response = " + weather.toString());
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, error.getMessage(), error);
+            }
+});
+
+VolleySingleton.getInstance(this).addToRequestQueue(request);
+```
+```
+com.zhuanghongji.volley.sample D/MainActivity: response = Weather{weatherInfo=WeatherInfo{city='北京', cityId='101010100', temp='19', wd='南风', ws='2级', sd='43%', wse='2', time='19:45', isRadar='1', radar='JC_RADAR_AZ9010_JB'}}
+```
+
 ## 自定义 XmlRequest
+实现代码
+```Java
+public class XmlRequest extends Request<XmlPullParser> {
 
+    private final Response.Listener<XmlPullParser> mListener;
 
-.....
+    public XmlRequest(String url, Response.Listener<XmlPullParser> listener,
+                      Response.ErrorListener errorListener) {
+        this(Method.GET, url, listener, errorListener);
+    }
+
+    public XmlRequest(int method, String url, Response.Listener<XmlPullParser> listener,
+                      Response.ErrorListener errorListener) {
+        super(method, url, errorListener);
+        mListener = listener;
+    }
+
+    @Override
+    protected Response<XmlPullParser> parseNetworkResponse(NetworkResponse response) {
+        try {
+            String xmlString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = factory.newPullParser();
+            parser.setInput(new StringReader(xmlString));
+            return Response.success(parser, HttpHeaderParser.parseCacheHeaders(response));
+        } catch (UnsupportedEncodingException e) {
+            return Response.error(new ParseError(e));
+        } catch (XmlPullParserException e) {
+            return Response.error(new ParseError(e));
+        }
+    }
+
+    @Override
+    protected void deliverResponse(XmlPullParser response) {
+        mListener.onResponse(response);
+    }
+}
+```
+
+我们先在 [MockApi](http://wanandroid.com/tools/mockapi) 生成一个返回链接 [http://wanandroid.com/tools/mockapi/1921/zhuanghongjiXmlRequest](http://wanandroid.com/tools/mockapi/1921/zhuanghongjiXmlRequest)，返回结果为：
+```xml
+<china dn="day" slick-uniqueid="3">
+    <city quName="黑龙江" pyName="heilongjiang" cityname="哈尔滨" state1="0" state2="0" stateDetailed="晴" tem1="18" tem2="6" windState="西北风3-4级转西风小于3级"/>
+    <city quName="吉林" pyName="jilin" cityname="长春" state1="0" state2="0" stateDetailed="晴" tem1="19" tem2="6" windState="西北风3-4级转小于3级"/>
+    <city quName="辽宁" pyName="liaoning" cityname="沈阳" state1="0" state2="0" stateDetailed="晴" tem1="21" tem2="7" windState="东北风3-4级"/>
+    <city quName="海南" pyName="hainan" cityname="海口" state1="1" state2="1" stateDetailed="多云" tem1="30" tem2="24" windState="微风"/>
+    <city quName="内蒙古" pyName="neimenggu" cityname="呼和浩特" state1="0" state2="0" stateDetailed="晴" tem1="19" tem2="5" windState="东风3-4级"/>
+</china>
+```
+
+示例代码和响应打印结果：
+```Java
+String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiXmlRequest";
+XmlRequest request = new XmlRequest(url, new Response.Listener<XmlPullParser>() {
+    @Override
+    public void onResponse(XmlPullParser response) {
+        try {
+            int eventType = response.getEventType();
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                switch (eventType) {
+                    case XmlPullParser.START_TAG:
+                        String nodeName = response.getName();
+                        if ("city".equals(nodeName)) {
+                            String quName = response.getAttributeValue(0);
+                            Log.d(TAG, "quName is " + quName);
+                        }
+                        break;
+                }
+                eventType = response.next();
+            }
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}, new Response.ErrorListener() {
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Log.e("TAG", error.getMessage(), error);
+    }
+});
+
+VolleySingleton.getInstance(this).addToRequestQueue(request);
+```
+```
+com.zhuanghongji.volley.sample D/MainActivity: quName is 黑龙江
+com.zhuanghongji.volley.sample D/MainActivity: quName is 吉林
+com.zhuanghongji.volley.sample D/MainActivity: quName is 辽宁
+com.zhuanghongji.volley.sample D/MainActivity: quName is 海南
+com.zhuanghongji.volley.sample D/MainActivity: quName is 内蒙古
+```
