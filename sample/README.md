@@ -37,7 +37,10 @@ public class VolleySingleton {
     }
 
     public ImageLoader getImageLoader() {
-        return mImageLoader;
+      if (mImageLoader == null) {
+          mImageLoader = new ImageLoader(getRequestQueue(), new BitmapCache());
+      }
+      return mImageLoader;
     }
 }
 ```
@@ -264,12 +267,134 @@ com.zhuanghongji.volley.sample E/MainActivity: org.json.JSONException: Value {"s
                                                    at com.android.volley.NetworkDispatcher.run(NetworkDispatcher.java:87) 
 ```
 
+# ImageRequest
+我们在页面上写了一个 `ImageView` 控件用于显示加载的图片，两个 `Button` 控件分别加载正确地址图片和错误地址图片（正确图片地址时加载的是 [wanandroid.com](http://www.wanandroid.com) 首页的 Logo，否则加载一个红色的 `drawable`）。
 
+示例代码和效果演示
+```java
+String tag = view.getTag().toString();
+String url = "RIGHT".equals(tag) ?
+        "http://www.wanandroid.com/resources/image/pc/logo.png" : "http://ERROR.png";
+final ImageView imageView = findViewById(R.id.imageView);
+ImageRequest request = new ImageRequest(url, new Response.Listener<Bitmap>() {
+    @Override
+    public void onResponse(Bitmap response) {
+        imageView.setImageBitmap(response);
+    }
+}, 0, 0, Bitmap.Config.RGB_565, new Response.ErrorListener() {
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        imageView.setImageResource(R.drawable.red);
+    }
+});
 
+VolleySingleton.getInstance(this).addToRequestQueue(request);
+```
+![](./image/ImageRequest3.gif)
 
+`ImageRequest` 构造函数的参数
+* 第三第四个参数分别用于指定允许图片最大的宽度和高度  
+ * 如果网络图片实际宽度或高度大于这里的最大值，则会对图片进行压缩
+ * 如果指定为0则表示不管图片有多大，都不会进行压缩
 
+* 第五个参数用于指定图片的颜色属性，`Bitmap.Config` 的几个枚举值都可以使用
+ * 其中 `ARGB_8888` 可展示最好的颜色属性，每个像素占据4个字节的大小
+ * 而 `RGB_565` 则表示每个图片像素占据2个字节的大小
 
+# ImageLoder
+尽管 `ImageRequest` 已经很好用，但实际上 `ImageLoader` 更加高效，因为它不仅可以帮我们对图片进行缓存，还可以过滤掉重复的链接，避免重复发送请求。  
 
+`ImageLoader` 的内部是通过 `ImageRequest` 实现的，并不是继承自 `Request` 的，所以用法跟其它请求有所不同，总结起来大致分为以下几个步骤：
+1. 创建一个 `RequestQueue` 对象
+2. 创建一个 `ImageLoader` 对象
+3. 创建一个 `ImageListener` 对象
+4. 调用 `ImageLoader` 的 `get()` 方法加载网络图片
+
+在前面的 **请求队列的单例实现** 中我们已经写好了创建 `RequestQueue` 和 `ImageLoader` 的代码，下面贴个 `BitmapCache` 的实现代码
+```java
+// 作为创建 ImageLoader 的入参，用于缓存图片
+public class BitmapCache implements ImageCache {
+
+    private LruCache<String, Bitmap> mCache;
+
+    public BitmapCache() {
+        int maxSize = 10 * 1024 * 1024; // 缓存图片的大小设置为10M
+        mCache = new LruCache<String, Bitmap>(maxSize) {
+            @Override
+            protected int sizeOf(String key, Bitmap value) {
+                return value.getRowBytes() * value.getHeight();
+            }
+        };
+    }
+
+    @Override
+    public Bitmap getBitmap(String url) {
+        return mCache.get(url);
+    }
+
+    @Override
+    public void putBitmap(String url, Bitmap bitmap) {
+        mCache.put(url, bitmap);
+    }
+}
+```
+
+其余示例代码和效果演示如下：
+```java
+final ImageView imageView = findViewById(R.id.imageView);
+String url = "http://www.wanandroid.com/resources/image/pc/logo.png";
+ImageLoader.ImageListener listener = ImageLoader.getImageListener(
+        imageView, R.drawable.green, R.drawable.red);
+VolleySingleton.getInstance(this).getImageLoader().get(
+        url, listener);
+```
+![](./image/ImageLoader1.gif)
+
+`ImageLoader.getImageListener()` 的参数：
+* 第一个参数：imageView，用于指定显示图片的 `ImageView` 控件
+* 第二个参数：defaultImageResId，开始加载网络图片和加载完成之前（即加载过程）显示的默认图片 id
+* 第三个参数：errorImageResId，加载失败时显示的图片 id
+
+从上面的动态图中可知：
+* 第一次加载时会先显示默认图片，待加载完成后再显示指定的 logo
+* 但当我们加载一张其它图片后，再去点击加载该 logo 时，并没有先加载默认图片，而是直接从缓存中加载了指定的 logo
+
+调用 `ImagerLoader.get()` 方法来加载图片，如果想对图片的大小进行限制，可使用另外一个重载方法
+```java
+VolleySingleton.getInstance(this).getImageLoader().get(
+        url, listener, 200, 200);
+```
+* 第三个参数用于指定最大宽度
+* 第四个参数用于指定最大高度
+
+# NetworkImageView
+除了前面两种加载图片方式外，Volley 还提供了一个控件 `NetworkImageView`，它是继承自 `ImageView` 的，具备了 `ImageView` 的所有功能，并且在原生基础上加入了加载图片的功能。
+使用方式的区别主要在于：
+* 需在布局文件中添加 `NetworkImageView` 控件
+* 在代码中获取该控件示例，然后设置要加载的图片地址
+
+示例代码和效果演示如下：
+```xml
+<com.android.volley.toolbox.NetworkImageView
+    android:id="@+id/networkImageView"
+    android:layout_width="72dp"
+    android:layout_height="36dp"
+    android:background="#225b87" />
+```
+```java
+String url = "https://www.baidu.com/img/bd_logo1.png"; // 百度首页 Logo
+NetworkImageView networkImageView = findViewById(R.id.networkImageView);
+networkImageView.setDefaultImageResId(R.drawable.green);
+networkImageView.setErrorImageResId(R.drawable.red);
+
+ImageLoader loader = VolleySingleton.getInstance(this).getImageLoader();
+networkImageView.setImageUrl(url, loader);
+```
+![](./image/NetworkImageView.gif)
+
+# 自定义请求
+## 自定义 GsonRequest
+## 自定义 XmlRequest
 
 
 .....

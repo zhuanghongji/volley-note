@@ -1,16 +1,21 @@
 package com.zhuanghongji.volley.sample;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.StringRequest;
 import com.zhuanghongji.volley.sample.volley.VolleySingleton;
 
@@ -31,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
     }
 
-    public void onStringRequestGetTest(View view) {
+    public void onStringRequestTest(View view) {
         String url = "https://www.baidu.com";
         Response.Listener<String> listener = new Response.Listener<String>() {
             @Override
@@ -63,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void onJsonObjectRequestPostTest(View view) {
+    public void onJsonObjectRequestTest(View view) {
         String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiJsonObjectRequest";
         // String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiJsonArrayRequest";
         JsonObjectRequest request = new JsonObjectRequest(url, null, new Response.Listener<JSONObject>() {
@@ -90,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         VolleySingleton.getInstance(this).addToRequestQueue(request);
     }
 
-    public void onJsonArrayRequestPostTest(View view) {
+    public void onJsonArrayRequestTest(View view) {
         // String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiJsonObjectRequest";
         String url = "http://wanandroid.com/tools/mockapi/1921/zhuanghongjiJsonArrayRequest";
         JsonArrayRequest request = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
@@ -118,4 +123,50 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void onImageRequestTest(View view) {
+        String tag = view.getTag().toString();
+        String url = "RIGHT".equals(tag) ?
+                "http://www.wanandroid.com/resources/image/pc/logo.png" : "http://ERROR.png";
+        final ImageView imageView = findViewById(R.id.imageView);
+        ImageRequest request = new ImageRequest(url, new Response.Listener<Bitmap>() {
+            @Override
+            public void onResponse(Bitmap response) {
+                imageView.setImageBitmap(response);
+            }
+        }, 0, 0, Bitmap.Config.RGB_565, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                imageView.setImageResource(R.drawable.red);
+            }
+        });
+
+        VolleySingleton.getInstance(this).addToRequestQueue(request);
+    }
+
+
+    public void onImageLoaderTest(View view) {
+        final ImageView imageView = findViewById(R.id.imageView);
+        String url = "http://www.wanandroid.com/resources/image/pc/logo.png";
+        ImageLoader.ImageListener listener = ImageLoader.getImageListener(
+                imageView, R.drawable.green, R.drawable.red);
+        VolleySingleton.getInstance(this).getImageLoader().get(
+                url, listener, 200, 200);
+    }
+
+    public void onNetworkImageViewTest(View view) {
+        String url = "https://www.baidu.com/img/bd_logo1.png"; // 百度首页 Logo
+        NetworkImageView networkImageView = findViewById(R.id.networkImageView);
+        networkImageView.setDefaultImageResId(R.drawable.green);
+        networkImageView.setErrorImageResId(R.drawable.red);
+
+        ImageLoader loader = VolleySingleton.getInstance(this).getImageLoader();
+        networkImageView.setImageUrl(url, loader);
+    }
+
+
+    public void onGsonRequestTest(View view) {
+    }
+
+    public void onXmlRequestTest(View view) {
+    }
 }

@@ -45,6 +45,9 @@ public class VolleySingleton {
     }
 
     public ImageLoader getImageLoader() {
+        if (mImageLoader == null) {
+            mImageLoader = new ImageLoader(getRequestQueue(), new BitmapCache());
+        }
         return mImageLoader;
     }
 }

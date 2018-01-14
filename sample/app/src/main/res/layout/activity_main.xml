@@ -1,33 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    tools:context="com.zhuanghongji.volley.sample.MainActivity">
+    android:layout_height="match_parent">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="onStringRequestGetTest"
-        android:textAllCaps="false"
-        android:onClick="onStringRequestGetTest"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        tools:context="com.zhuanghongji.volley.sample.MainActivity">
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="onJsonObjectRequestPostTest"
-        android:textAllCaps="false"
-        android:onClick="onJsonObjectRequestPostTest"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onStringRequestTest"
+            android:text="onStringRequestTest"
+            android:textAllCaps="false" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="onJsonArrayRequestPostTest"
-        android:textAllCaps="false"
-        android:onClick="onJsonArrayRequestPostTest"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onJsonObjectRequestTest"
+            android:text="onJsonObjectRequestTest"
+            android:textAllCaps="false" />
 
-</LinearLayout>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onJsonArrayRequestTest"
+            android:text="onJsonArrayRequestTest"
+            android:textAllCaps="false" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:background="#225b87" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onImageRequestTest"
+            android:tag="RIGHT"
+            android:text="onImageRequestTest-RIGHT"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onImageRequestTest"
+            android:tag="ERROR"
+            android:text="onImageRequestTest-ERROR"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onImageLoaderTest"
+            android:tag="ERROR"
+            android:text="onImageLoaderTest"
+            android:textAllCaps="false" />
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/networkImageView"
+            android:layout_width="72dp"
+            android:layout_height="36dp"
+            android:background="#225b87" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onNetworkImageViewTest"
+            android:text="onNetworkImageViewTest"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onGsonRequestTest"
+            android:text="onGsonRequestTest"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="onXmlRequestTest"
+            android:text="onXmlRequestTest"
+            android:textAllCaps="false" />
+
+    </LinearLayout>
+</ScrollView>
