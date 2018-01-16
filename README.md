@@ -51,7 +51,16 @@ git clone https://github.com/google/volley
 * [示例分析 /sample/README.md](https://github.com/zhuanghongji/volley-note/blob/master/sample/README.md)
 
 # 源码分析
-* Volley 访问网络的整体流程
+Volley 的源码主要分为三个部分：
+* main.java.com.android.volley
+* main.java.com.android.volley.toolbox
+* test.java.com.android.volley
+
+|共24个类|共22个类|共39个类
+|--|--|--
+|![](./decode/image/code_volley_main.png)|![](./decode/image/code_volley_toolbox.png)|![](./decode/image/code_volley_test.png)
+
+* Volley 的执行流程
 * 源码中一些重要类的请求
 
 
